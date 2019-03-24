@@ -3,33 +3,42 @@ module.exports = function check(str, bracketsConfig) {
     let arg = bracketsConfig;
     let bracketsOpen = [];
     let bracketsClose = [];
+    let bracketsSame = [];
     arg.map((item) => {
-        bracketsOpen.push(item[0]);
-        bracketsClose.push(item[1]);
+        if (item[0] != item[1]) {
+            bracketsOpen.push(item[0]);
+            bracketsClose.push(item[1]);
+        } else {
+            bracketsSame.push(item[0])
+        }
     });
-    let i;
     let l=str.length;
     let char;
     let last;
     let stack=[];
-    let index;
-        // bracketsOpen=["(","{","["],
-        // bracketsClose=[")","}","]"];
 
-    for(i=0; i<l; i++){
-        char=str[i];
-
-        if(bracketsOpen.indexOf(char) != -1){
-            stack.push(last=char);
-        }else if((index=bracketsClose.indexOf(char))!=-1){
-            if(last && last==bracketsOpen[index]){
-                stack.pop();
-                last=stack[stack.length-1];
-            }else{
+    for (let i = 0; i < l; i++) {
+        char = str[i];
+        if (bracketsClose.indexOf(char) > -1) {
+            last = bracketsOpen[bracketsClose.indexOf(char)];
+            if (stack.length === 0 || (stack.pop() !== last)) {
                 return false;
             }
+
+        }
+        else if (bracketsSame.indexOf(char) > -1){
+            if (stack[stack.length-1] === char) {
+                stack.pop();
+            }
+            else {
+                stack.push(char);
+            }
+        }
+        else {
+            stack.push(char);
         }
     }
-    return !last;
+
+    return (stack.length === 0);
 
 }
